@@ -1,13 +1,24 @@
 var APIKey = "b417359692c82a9e4c2d44064c15cf54";
 var baseURL = "https://api.openweathermap.org/data/2.5/"
 
-function fetchData(apiUrl, successCallback, errorCallback) {
-fetch(apiUrl)
+function fetchData(city, endpoint, successCallback, errorCallback) {
+fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${APIKey}`)
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
     return response.json();
+    })
+    .then(data => {
+        var latitude = data[0].lat;
+        var longitude = data[0].lon;
+        return fetch(`${baseURL}${endpoint}?lat=${latitude}&lon=${longitude}&units=metric&appid=${APIKey}`)
+        })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
     })
     .then(data => successCallback(data))
     .catch(error => errorCallback(error));
@@ -133,8 +144,8 @@ function handelButtonClick(e){
     }
     localStorage.setItem("searchHistory", JSON.stringify([searchTerm, ...currentSeatchHistory]))
 
-    fetchData(`${baseURL}forecast?q=${searchTerm}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
-    fetchData(`${baseURL}weather?q=${searchTerm}&units=metric&appid=${APIKey}`, displayTodayForcast, showError)
+    fetchData(searchTerm, "forecast", build5DayForcast, showError)
+    fetchData(searchTerm, "weather", displayTodayForcast, showError)
 
     displaySearchHistory()
 
@@ -152,8 +163,8 @@ function initPage(){
     var searchHistory = getLocalStorage("searchHistory");
     console.log(searchHistory)
     if(searchHistory.length>0){
-        fetchData(`${baseURL}forecast?q=${searchHistory[0]}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
-        fetchData(`${baseURL}weather?q=${searchHistory[0]}&units=metric&appid=${APIKey}`, displayTodayForcast, showError)
+        fetchData(searchHistory[0], "forecast", build5DayForcast, showError)
+        fetchData(searchHistory[0], "weather", displayTodayForcast, showError)
     } else {
         $("#today").append($("<h2>", {class: "m-3", text: "Oh no, looks like you haven't searched for anything yet..."}))
     }
