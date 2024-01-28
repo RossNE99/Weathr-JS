@@ -71,18 +71,14 @@ function displayTodayForcast(data){
         class: "card bg-dark text-white",
         style: "height: 170px",
         html: `
-
         <div class="card-img-overlay">
             <h5 class="card-title">${data.name}</h5>
             <p class="card-text">Temp: ${temp}</p>
             <p class="card-text">Wind: ${windSpeed}</p>
             <p class="card-text">Humidity: ${humidity}</p>
         </div>`
-
     })
-
     $("#today").append(todayForcast)
-
 }
 
 fetchData("https://api.openweathermap.org/data/2.5/forecast?q=Bradford&units=metric&appid=" + APIKey, build5DayForcast, showError)
