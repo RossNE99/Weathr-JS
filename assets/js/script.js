@@ -16,6 +16,11 @@ function showError(e){
 function build5DayForcast(data){
     console.log(data)
     var fiveDayForcast = []
+    if(data.cod !== "200"){
+        fiveDayForcast = "error"
+        display5DayForcast(fiveDayForcast)
+        return
+    }
     var unixTimeStampsToBuilForcast = []
     var CurrentDayItteration = dayjs().add(1, "day").set('hour', 12).set('minute', 0).set('second', 0);
     for(let i=0; i <=5; i++){
@@ -39,6 +44,11 @@ function build5DayForcast(data){
 }
 
 function display5DayForcast(data){
+    $("#forecast").empty();
+    if(data === "error"){
+        $("#forecast").append($("<h2>", {class: "m-3", text: "Something went wrong, did you enter a valid city?"}))
+        return
+    }
     $.each(data, function(index, dayForcast){
         var {temp, humidity} = dayForcast.main
         var {speed: windSpeed} = dayForcast.wind
@@ -61,9 +71,11 @@ function display5DayForcast(data){
 }
 
 function displayTodayForcast(data){
+    if(data.cod !== "200") return
     console.log("tt")
     console.log(data)
 
+    $("#today").empty();
     var {temp, humidity} = data.main
     var {speed: windSpeed} = data.wind
     //        <img class="card-img" src="..." alt="Card image">
@@ -93,10 +105,22 @@ function displaySearchHistory(){
     })
 }
 
+function handelButtonClick(e){
+    if(!$(e.target).hasClass('btn')) return
+    e.preventDefault()
+    var searchTerm;
+    
+    if(e.target.id === "search-button"){
+        searchTerm = $("#search-input").val()
+    } else if($(e.target).hasClass("btn-secondary")) {
+        searchTerm = $(e.target).text()
+    }
+
+    fetchData(`https://api.openweathermap.org/data/2.5/forecast?q=${searchTerm}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
+    fetchData(`https://api.openweathermap.org/data/2.5/weather?q=${searchTerm}&appid=${APIKey}`, displayTodayForcast, showError)
+
+}
 
 displaySearchHistory()
 
-
-
-fetchData("https://api.openweathermap.org/data/2.5/forecast?q=Bradford&units=metric&appid=" + APIKey, build5DayForcast, showError)
-fetchData("https://api.openweathermap.org/data/2.5/weather?q=Bradford&appid=" + APIKey, displayTodayForcast, showError)
+$("aside").on("click", handelButtonClick)
