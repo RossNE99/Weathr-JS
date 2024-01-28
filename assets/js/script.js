@@ -50,11 +50,13 @@ function display5DayForcast(data){
     $.each(data, function(index, dayForcast){
         var {temp, humidity} = dayForcast.main
         var {speed: windSpeed} = dayForcast.wind
+        var iconLink = `https://openweathermap.org/img/wn/${dayForcast.weather[0].icon}@2x.png`
         var forcastCard = $("<div>", {
             class:"card m-2 col-sm-12 col-md",
             html: `
                 <div class="card-body">
                 <h5 class="card-title">${dayjs.unix(dayForcast.dt).format("D/M/YYYY")}</h5>
+                <img height=65 src="${iconLink}" />
                 <p class="card-text"></p>
                 </div>
                 <ul class="list-group list-group-flush">
