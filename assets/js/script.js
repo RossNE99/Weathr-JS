@@ -43,7 +43,7 @@ function display5DayForcast(data){
         var {temp, humidity} = dayForcast.main
         var {speed: windSpeed} = dayForcast.wind
         var forcastCard = $("<div>", {
-            class:"card m-2 col",
+            class:"card m-2 col-sm-12 col-md",
             html: `
                 <div class="card-body">
                 <h5 class="card-title">${dayjs.unix(dayForcast.dt).format("D/M/YYYY")}</h5>
@@ -61,6 +61,27 @@ function display5DayForcast(data){
 }
 
 function displayTodayForcast(data){
+    console.log("tt")
+    console.log(data)
+
+    var {temp, humidity} = data.main
+    var {speed: windSpeed} = data.wind
+    //        <img class="card-img" src="..." alt="Card image">
+    var todayForcast = $("<div>", {
+        class: "card bg-dark text-white",
+        style: "height: 170px",
+        html: `
+
+        <div class="card-img-overlay">
+            <h5 class="card-title">${data.name}</h5>
+            <p class="card-text">Temp: ${temp}</p>
+            <p class="card-text">Wind: ${windSpeed}</p>
+            <p class="card-text">Humidity: ${humidity}</p>
+        </div>`
+
+    })
+
+    $("#today").append(todayForcast)
 
 }
 
