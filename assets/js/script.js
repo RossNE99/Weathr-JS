@@ -56,7 +56,7 @@ function display5DayForcast(data){
             html: `
                 <div class="card-body">
                 <h5 class="card-title">${dayjs.unix(dayForcast.dt).format("D/M/YYYY")}</h5>
-                <img height=65 src="${iconLink}" />
+                <img height=65 src="${iconLink}" style="margin-bottom: -13px" />
                 <p class="card-text"></p>
                 </div>
                 <ul class="list-group list-group-flush">
@@ -70,24 +70,26 @@ function display5DayForcast(data){
     })
 }
 
-function displayTodayForcast(data){
-    if(data.cod !== 200) return
+function displayTodayForcast(dayForcast){
+    if(dayForcast.cod !== 200) return
     console.log("tt")
-    console.log(data)
+    console.log(dayForcast)
 
     $("#today").empty();
-    var {temp, humidity} = data.main
-    var {speed: windSpeed} = data.wind
+    var {temp, humidity} = dayForcast.main
+    var {speed: windSpeed} = dayForcast.wind
+    var iconLink = `https://openweathermap.org/img/wn/${dayForcast.weather[0].icon}@2x.png`
     //        <img class="card-img" src="..." alt="Card image">
     var todayForcast = $("<div>", {
         class: "card bg-dark text-white",
-        style: "height: 170px",
+        style: "height: 190px",
         html: `
         <div class="card-img-overlay">
-            <h5 class="card-title">${data.name}</h5>
-            <p class="card-text">Temp: ${temp}</p>
-            <p class="card-text">Wind: ${windSpeed}</p>
-            <p class="card-text">Humidity: ${humidity}</p>
+            <h5 class="card-title">${dayForcast.name}</h5>
+            <img style="margin: -10px" height=65 src="${iconLink}" />
+            <p class="card-text mb-2">Temp: ${Math.floor(temp)}°C</p>
+            <p class="card-text mb-2">Wind: ${windSpeed}</p>
+            <p class="card-text mb-2">Humidity: ${humidity}</p>
         </div>`
     })
     $("#today").append(todayForcast)
@@ -127,7 +129,7 @@ function handelButtonClick(e){
     localStorage.setItem("searchHistory", JSON.stringify([searchTerm, ...currentSeatchHistory]))
 
     fetchData(`${baseURL}forecast?q=${searchTerm}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
-    fetchData(`${baseURL}weather?q=${searchTerm}&appid=${APIKey}`, displayTodayForcast, showError)
+    fetchData(`${baseURL}weather?q=${searchTerm}&units=metric&appid=${APIKey}`, displayTodayForcast, showError)
 
     displaySearchHistory()
 
