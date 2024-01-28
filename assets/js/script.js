@@ -47,6 +47,8 @@ function build5DayForcast(data){
 
 function display5DayForcast(data){
     $("#forecast").empty();
+    var sectionTitle = $("<h3>", {class: "mt-4", text: "Five Day Forecast:"})
+    $($("#forecast").append(sectionTitle))
     $.each(data, function(index, dayForcast){
         var {temp, humidity} = dayForcast.main
         var {speed: windSpeed} = dayForcast.wind
@@ -76,6 +78,8 @@ function displayTodayForcast(dayForcast){
     console.log(dayForcast)
 
     $("#today").empty();
+    var sectionTitle = $("<h3>", {class: "mt-4", text: "Today:"})
+    $($("#today").append(sectionTitle))
     var {temp, humidity} = dayForcast.main
     var {speed: windSpeed} = dayForcast.wind
     var iconLink = `https://openweathermap.org/img/wn/${dayForcast.weather[0].icon}@2x.png`
