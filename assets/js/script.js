@@ -6,7 +6,7 @@ fetch(apiUrl)
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
-          }
+        }
     return response.json();
     })
     .then(data => successCallback(data))
@@ -57,6 +57,7 @@ function display5DayForcast(data){
             class:"card m-2 col-sm-12 col-md",
             html: `
                 <div class="card-body">
+                <h6 class="mb-1">${dayjs.unix(dayForcast.dt).format("dddd")}</h6>
                 <h5 class="card-title">${dayjs.unix(dayForcast.dt).format("D/M/YYYY")}</h5>
                 <img height=65 src="${iconLink}" style="margin-bottom: -13px" />
                 <p class="card-text"></p>
@@ -142,9 +143,23 @@ function handelButtonClick(e){
 function getLocalStorage(key){
     var data = JSON.parse(localStorage.getItem(key))
     if(!data) data = []
+    console.log(data)
     return data
 }
 
-displaySearchHistory()
+
+function initPage(){
+    var searchHistory = getLocalStorage("searchHistory");
+    console.log(searchHistory)
+    if(searchHistory.length>0){
+        fetchData(`${baseURL}forecast?q=${searchHistory[0]}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
+        fetchData(`${baseURL}weather?q=${searchHistory[0]}&units=metric&appid=${APIKey}`, displayTodayForcast, showError)
+    } else {
+        $("#today").append($("<h2>", {class: "m-3", text: "Oh no, looks like you haven't searched for anything yet..."}))
+    }
+    displaySearchHistory()
+}
+
+initPage()
 
 $("aside").on("click", handelButtonClick)
