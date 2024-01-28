@@ -1,8 +1,12 @@
 var APIKey = "b417359692c82a9e4c2d44064c15cf54";
+var baseURL = "https://api.openweathermap.org/data/2.5/"
 
 function fetchData(apiUrl, successCallback, errorCallback) {
 fetch(apiUrl)
     .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
     return response.json();
     })
     .then(data => successCallback(data))
@@ -11,16 +15,14 @@ fetch(apiUrl)
 
 function showError(e){
     console.log(e)
+    $("#today").empty();
+    $("#forecast").empty();
+    $("#forecast").append($("<h2>", {class: "m-3", text: "Something went wrong, did you enter a valid city?"}))
 }
 
 function build5DayForcast(data){
     console.log(data)
     var fiveDayForcast = []
-    if(data.cod !== "200"){
-        fiveDayForcast = "error"
-        display5DayForcast(fiveDayForcast)
-        return
-    }
     var unixTimeStampsToBuilForcast = []
     var CurrentDayItteration = dayjs().add(1, "day").set('hour', 12).set('minute', 0).set('second', 0);
     for(let i=0; i <=5; i++){
@@ -45,10 +47,6 @@ function build5DayForcast(data){
 
 function display5DayForcast(data){
     $("#forecast").empty();
-    if(data === "error"){
-        $("#forecast").append($("<h2>", {class: "m-3", text: "Something went wrong, did you enter a valid city?"}))
-        return
-    }
     $.each(data, function(index, dayForcast){
         var {temp, humidity} = dayForcast.main
         var {speed: windSpeed} = dayForcast.wind
@@ -71,7 +69,7 @@ function display5DayForcast(data){
 }
 
 function displayTodayForcast(data){
-    if(data.cod !== "200") return
+    if(data.cod !== 200) return
     console.log("tt")
     console.log(data)
 
@@ -94,8 +92,9 @@ function displayTodayForcast(data){
 }
 
 function displaySearchHistory(){
-    var searchHistory = ["asdasda", "adasdasd", "sdasdasd", "wsadasd"]
+    var searchHistory = getLocalStorage("searchHistory")
 
+    $("#history").empty();
     $.each(searchHistory, function(index, searchedCity){
         var searchHistoryBtn = $("<button>", {
             class: "btn btn-secondary m-1",
@@ -116,9 +115,26 @@ function handelButtonClick(e){
         searchTerm = $(e.target).text()
     }
 
-    fetchData(`https://api.openweathermap.org/data/2.5/forecast?q=${searchTerm}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
-    fetchData(`https://api.openweathermap.org/data/2.5/weather?q=${searchTerm}&appid=${APIKey}`, displayTodayForcast, showError)
+    if(!searchTerm || searchTerm === "") return
 
+    var currentSeatchHistory = getLocalStorage("searchHistory")
+    if(currentSeatchHistory.includes(searchTerm)){
+        const indexToBeRemovedAndReaddedToTopOfList = currentSeatchHistory.indexOf(searchTerm);
+        currentSeatchHistory.splice(indexToBeRemovedAndReaddedToTopOfList, 1)
+    }
+    localStorage.setItem("searchHistory", JSON.stringify([searchTerm, ...currentSeatchHistory]))
+
+    fetchData(`${baseURL}forecast?q=${searchTerm}&units=metric&appid=${APIKey}`, build5DayForcast, showError)
+    fetchData(`${baseURL}weather?q=${searchTerm}&appid=${APIKey}`, displayTodayForcast, showError)
+
+    displaySearchHistory()
+
+}
+
+function getLocalStorage(key){
+    var data = JSON.parse(localStorage.getItem(key))
+    if(!data) data = []
+    return data
 }
 
 displaySearchHistory()
