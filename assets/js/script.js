@@ -81,5 +81,22 @@ function displayTodayForcast(data){
     $("#today").append(todayForcast)
 }
 
+function displaySearchHistory(){
+    var searchHistory = ["asdasda", "adasdasd", "sdasdasd", "wsadasd"]
+
+    $.each(searchHistory, function(index, searchedCity){
+        var searchHistoryBtn = $("<button>", {
+            class: "btn btn-secondary m-1",
+            text: searchedCity
+        })
+        $("#history").append(searchHistoryBtn)
+    })
+}
+
+
+displaySearchHistory()
+
+
+
 fetchData("https://api.openweathermap.org/data/2.5/forecast?q=Bradford&units=metric&appid=" + APIKey, build5DayForcast, showError)
 fetchData("https://api.openweathermap.org/data/2.5/weather?q=Bradford&appid=" + APIKey, displayTodayForcast, showError)
