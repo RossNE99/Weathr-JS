@@ -34,16 +34,35 @@ function build5DayForcast(data){
     }
 
     console.log(fiveDayForcast)
-    return fiveDayForcast
+    display5DayForcast(fiveDayForcast)
+    return
 }
 
 function display5DayForcast(data){
+    $.each(data, function(index, dayForcast){
+        var {temp, humidity} = dayForcast.main
+        var {speed: windSpeed} = dayForcast.wind
+        var forcastCard = $("<div>", {
+            class:"card m-2 col",
+            html: `
+                <div class="card-body">
+                <h5 class="card-title">${dayjs.unix(dayForcast.dt).format("D/M/YYYY")}</h5>
+                <p class="card-text"></p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Temp: ${Math.floor(temp)}°C</li>
+                    <li class="list-group-item">Wind: ${windSpeed}</li>
+                    <li class="list-group-item">Humidity: ${humidity}%</li>
+                </ul>`,
+        })
 
+        $("#forecast").append(forcastCard)
+    })
 }
 
 function displayTodayForcast(data){
 
 }
 
-fetchData("https://api.openweathermap.org/data/2.5/forecast?q=Bradford&appid=" + APIKey, display5DayForcast, showError)
+fetchData("https://api.openweathermap.org/data/2.5/forecast?q=Bradford&units=metric&appid=" + APIKey, build5DayForcast, showError)
 fetchData("https://api.openweathermap.org/data/2.5/weather?q=Bradford&appid=" + APIKey, displayTodayForcast, showError)
